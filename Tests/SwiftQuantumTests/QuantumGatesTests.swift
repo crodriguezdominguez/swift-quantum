@@ -129,6 +129,14 @@ class QuantumGatesTests : XCTestCase {
         
         let transformed2 = PauliXGate().transform(input: transformed1)
         XCTAssertTrue(transformed2.excitedStateProbability == 1.0)
+        
+        let quBit2 = QuBit(groundAmplitude: .oneAmplitude, excitedAmplitude: .zeroAmplitude)
+        
+        let transformed3 = PauliXGate().transform(input: quBit2)
+        XCTAssertTrue(transformed3.groundStateProbability == 0.0 && transformed3.excitedStateProbability == 1.0)
+        
+        let transformed4 = PauliXGate().transform(input: transformed3)
+        XCTAssertTrue(transformed4.groundStateProbability == 1.0 && transformed4.excitedStateProbability == 0.0)
     }
     
     func testHXHIsEqualToZ() {
