@@ -11,7 +11,7 @@ import Foundation
 open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransformer {
     fileprivate var matrix:QuAmplitudeMatrix? = nil
     open internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
-    open fileprivate(set) var transformerName:String
+    open var transformerName:String
     open fileprivate(set) var numberOfInputs:Int
     open fileprivate(set) var numberOfOutputs:Int
     
@@ -65,6 +65,10 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
     
     fileprivate func reloadCacheTransformationMatrix() {
         _transformationMatrix = nil
+    }
+    
+    open func clear(time: Int) {
+        self.timeline.removeValue(forKey: time)
     }
     
     open func append(transformers: (transformer:QuBitTransformer, time:Int, inputIndices:[Int])...) throws {
