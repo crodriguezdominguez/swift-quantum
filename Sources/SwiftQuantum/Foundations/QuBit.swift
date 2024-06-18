@@ -28,30 +28,30 @@ public enum QuBitState {
 public typealias QuAmplitude = Complex
 
 extension QuAmplitude {
-    public static var oneAmplitude:QuAmplitude {
+    public static var one: QuAmplitude {
         return QuAmplitude(1.0, 0.0)
     }
     
-    public static var zeroAmplitude:QuAmplitude {
+    public static var zero: QuAmplitude {
         return QuAmplitude(0.0, 0.0)
     }
 }
 
 public struct QuBit : CustomStringConvertible, Equatable, QuAmplitudeMatrixConvertible {
-    public fileprivate(set) var groundAmplitude:QuAmplitude
-    public fileprivate(set) var excitedAmplitude:QuAmplitude
+    public fileprivate(set) var groundAmplitude: QuAmplitude
+    public fileprivate(set) var excitedAmplitude: QuAmplitude
     
-    public static let grounded:QuBit = QuBit(groundAmplitude: .oneAmplitude, excitedAmplitude: .zeroAmplitude)
-    public static let excited:QuBit = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: .oneAmplitude)
+    public static let grounded:QuBit = QuBit(groundAmplitude: .one, excitedAmplitude: .zero)
+    public static let excited:QuBit = QuBit(groundAmplitude: .zero, excitedAmplitude: .one)
     
     public init(grounded:Bool=true) {
         if grounded {
-            groundAmplitude = .oneAmplitude
-            excitedAmplitude = .zeroAmplitude
+            groundAmplitude = .one
+            excitedAmplitude = .zero
         }
         else{
-            groundAmplitude = .zeroAmplitude
-            excitedAmplitude = .oneAmplitude
+            groundAmplitude = .zero
+            excitedAmplitude = .one
 
         }
     }
@@ -165,11 +165,11 @@ public struct QuBit : CustomStringConvertible, Equatable, QuAmplitudeMatrixConve
         let result = inmutableMeasure()
         switch result {
         case .excited:
-            groundAmplitude = .zeroAmplitude
-            excitedAmplitude = .oneAmplitude
+            groundAmplitude = .zero
+            excitedAmplitude = .one
         case .grounded:
-            groundAmplitude = .oneAmplitude
-            excitedAmplitude = .zeroAmplitude
+            groundAmplitude = .one
+            excitedAmplitude = .zero
         case .undefined:
             break
         }
@@ -180,20 +180,20 @@ public struct QuBit : CustomStringConvertible, Equatable, QuAmplitudeMatrixConve
         var result = ""
         
         var sign = " + "
-        if groundAmplitude == .oneAmplitude {
+        if groundAmplitude == .one {
             result += "|0〉"
         }
-        else if groundAmplitude != .zeroAmplitude {
+        else if groundAmplitude != .zero {
             result += "\(groundAmplitude)|0〉"
         }
         else{
             sign = ""
         }
         
-        if excitedAmplitude == .oneAmplitude {
+        if excitedAmplitude == .one {
             result += "\(sign)|1〉"
         }
-        else if excitedAmplitude != .zeroAmplitude {
+        else if excitedAmplitude != .zero {
             var excitedDescription = excitedAmplitude.description
             if excitedDescription.hasPrefix("-") && !result.isEmpty {
                 excitedDescription = excitedDescription.trimmingCharacters(in: CharacterSet(charactersIn: "-"))

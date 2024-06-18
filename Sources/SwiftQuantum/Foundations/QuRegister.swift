@@ -117,7 +117,7 @@ public struct QuRegister : MutableCollection, CustomStringConvertible, QuAmplitu
     }
     
     public func amplitude(forStateNumber index:UInt64) -> QuAmplitude {
-        var amplitude = QuAmplitude.oneAmplitude
+        var amplitude = QuAmplitude.one
         for (idx, quBit) in self.quBits.enumerated() {
             amplitude *= self.amplitude(of: quBit, atIndex: idx, forPosition: UInt(index))
         }
@@ -143,7 +143,7 @@ public struct QuRegister : MutableCollection, CustomStringConvertible, QuAmplitu
         var coherentState = true
         var coherenceBinary = ""
         for quBit in quBits {
-            if quBit.groundAmplitude != .oneAmplitude && quBit.excitedAmplitude != .oneAmplitude {
+            if quBit.groundAmplitude != .one && quBit.excitedAmplitude != .one {
                 coherentState = false
                 break
             }

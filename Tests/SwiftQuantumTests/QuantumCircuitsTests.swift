@@ -33,10 +33,10 @@ class QuantumCircuitsTests : XCTestCase {
             )
             let result = try circuit.transform(input: QuRegister(quBits: quBit1, quBit2))
             XCTAssertTrue(result.rows == 4 && result.columns == 1)
-            XCTAssertTrue(result[0,0] == .zeroAmplitude)
+            XCTAssertTrue(result[0,0] == .zero)
             XCTAssertTrue(result[1,0] == QuAmplitude(cos(.pi/4.0), sin(.pi/4.0)))
-            XCTAssertTrue(result[2,0] == .zeroAmplitude)
-            XCTAssertTrue(result[3,0] == .zeroAmplitude)
+            XCTAssertTrue(result[2,0] == .zero)
+            XCTAssertTrue(result[3,0] == .zero)
             XCTAssertTrue(circuit.countGates == 5)
         }catch{
             XCTAssert(false)
@@ -72,8 +72,8 @@ class QuantumCircuitsTests : XCTestCase {
     }
     
     func testInvertedControlledNotIsEqualToHadamardControlledNotAndHadamardCircuit() {
-        let quBit1 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zeroAmplitude)
-        let quBit2 = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: .oneAmplitude)
+        let quBit1 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zero)
+        let quBit2 = QuBit(groundAmplitude: .zero, excitedAmplitude: .one)
         
         do {
             let invControlledResult = ControlledNotGate().transform(input: (quBit2, quBit1))
@@ -98,8 +98,8 @@ class QuantumCircuitsTests : XCTestCase {
     }
     
     func testSwapTransformationMatrixEqualsItsCircuitImplementation() {
-        let quBit1 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zeroAmplitude)
-        let quBit2 = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: .oneAmplitude)
+        let quBit1 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zero)
+        let quBit2 = QuBit(groundAmplitude: .zero, excitedAmplitude: .one)
         
         do {
             let swappedQuBits = SwapGate().transform(input: (quBit1, quBit2))

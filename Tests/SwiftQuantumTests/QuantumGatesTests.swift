@@ -57,7 +57,7 @@ class QuantumGatesTests : XCTestCase {
     }
     
     func testTwoSquareRootOfNotGatesProduceANotGate() {
-        let quBit = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zeroAmplitude)
+        let quBit = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zero)
         do{
             let output1 = SquareRootOfNotGate().transform(input: quBit)
             XCTAssertTrue(output1.groundStateProbability =~ output1.excitedStateProbability)
@@ -78,7 +78,7 @@ class QuantumGatesTests : XCTestCase {
     }
     
     func testACompiledGateProducesTheSameResultAsAChainTransformationUsingThoseGates() {
-        let quBit = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zeroAmplitude)
+        let quBit = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zero)
         
         do {
             let HQuBit1 = HadamardGate().transform(input: quBit)
@@ -97,7 +97,7 @@ class QuantumGatesTests : XCTestCase {
     
     func testTwoSquareRootOfSwapGatesProduceASwapGate() {
         let quBit1 = QuBit.grounded
-        let quBit2 = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: 1.0.i)
+        let quBit2 = QuBit(groundAmplitude: .zero, excitedAmplitude: 1.0.i)
         let register = QuRegister(quBits: quBit1, quBit2)
         
         do {
@@ -112,8 +112,8 @@ class QuantumGatesTests : XCTestCase {
     }
     
     func testZIsEqualToPhaseOfPi() {
-        let quBit1 = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: 1.0.i)
-        let quBit2 = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: 1.0.i)
+        let quBit1 = QuBit(groundAmplitude: .zero, excitedAmplitude: 1.0.i)
+        let quBit2 = QuBit(groundAmplitude: .zero, excitedAmplitude: 1.0.i)
         
         let pauliZTransformedQuBit = PauliZGate().transform(input: quBit1)
         let phasePiTransformedQuBit = PhaseGate(parameter: .pi).transform(input: quBit2)
@@ -122,17 +122,25 @@ class QuantumGatesTests : XCTestCase {
     }
     
     func testAPauliXGateProducesAClassicalNot() {
-        let quBit = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: 1.0.i)
+        let quBit = QuBit(groundAmplitude: .zero, excitedAmplitude: 1.0.i)
         
         let transformed1 = PauliXGate().transform(input: quBit)
         XCTAssertTrue(transformed1.groundStateProbability == 1.0)
         
         let transformed2 = PauliXGate().transform(input: transformed1)
         XCTAssertTrue(transformed2.excitedStateProbability == 1.0)
+        
+        let quBit2 = QuBit(groundAmplitude: .one, excitedAmplitude: .zero)
+        
+        let transformed3 = PauliXGate().transform(input: quBit2)
+        XCTAssertTrue(transformed3.groundStateProbability == 0.0 && transformed3.excitedStateProbability == 1.0)
+        
+        let transformed4 = PauliXGate().transform(input: transformed3)
+        XCTAssertTrue(transformed4.groundStateProbability == 1.0 && transformed4.excitedStateProbability == 0.0)
     }
     
     func testHXHIsEqualToZ() {
-        let quBit = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: 1.0.i)
+        let quBit = QuBit(groundAmplitude: .zero, excitedAmplitude: 1.0.i)
         
         do {
             let pauliZTransformedQuBit = PauliZGate().transform(input: quBit)
@@ -154,8 +162,8 @@ class QuantumGatesTests : XCTestCase {
     
     func testMultipleControlInputsControlledGateWithTwoInputsIsEqualToOneUniversalControlledGate() {
         let quBit1 = QuBit.grounded
-        let quBit2 = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: 1.0.i)
-        let quBit3 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zeroAmplitude)
+        let quBit2 = QuBit(groundAmplitude: .zero, excitedAmplitude: 1.0.i)
+        let quBit3 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zero)
         
         let gate1 = MultiControlMultiTargetControlledGate(numberOfControlInputs: 2, targetGate: PauliZGate())
         let gate2 = UniversalCCGate(gate: PauliZGate())

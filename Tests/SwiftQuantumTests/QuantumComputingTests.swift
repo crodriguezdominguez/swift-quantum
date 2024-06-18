@@ -20,7 +20,7 @@ class QuantumComputingTests: XCTestCase {
     }
     
     func testAQuBitWithGroundAmplitudeOf1HasAGroundStateOf1() {
-        var qbit1 = QuBit(groundAmplitude: .oneAmplitude, excitedAmplitude: .zeroAmplitude)
+        var qbit1 = QuBit(groundAmplitude: .one, excitedAmplitude: .zero)
         if case .grounded(let state) = qbit1.measure() {
             XCTAssertTrue(state =~ 1.0)
         }
@@ -28,7 +28,7 @@ class QuantumComputingTests: XCTestCase {
             XCTAssert(false)
         }
         
-        var qbit2 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zeroAmplitude)
+        var qbit2 = QuBit(groundAmplitude: 1.0.i, excitedAmplitude: .zero)
         if case .grounded(let state) = qbit2.measure() {
             XCTAssertTrue(state =~ 1.0)
         }
@@ -46,7 +46,7 @@ class QuantumComputingTests: XCTestCase {
             XCTAssert(false)
         }
         
-        var qbit2 = QuBit(groundAmplitude: .zeroAmplitude, excitedAmplitude: 1.0.i)
+        var qbit2 = QuBit(groundAmplitude: .zero, excitedAmplitude: 1.0.i)
         if case .excited(let state) = qbit2.measure() {
             XCTAssertTrue(state =~ 1.0)
         }
