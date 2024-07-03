@@ -12,9 +12,12 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
     open internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
     open var transformerName:String
     open fileprivate(set) var numberOfInputs:Int
-    open fileprivate(set) var numberOfOutputs:Int
     
     fileprivate var _transformationMatrix: QuAmplitudeMatrix? = nil
+    
+    public var numberOfOutputs: Int {
+        numberOfInputs
+    }
     
     open var transformationMatrix: QuAmplitudeMatrix {
         if let tr = _transformationMatrix {
@@ -44,16 +47,9 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         fatalError("init() constructor can not be used in circuits")
     }
     
-    public init(name:String, numberOfInputs:Int, numberOfOutputs:Int) {
-        self.transformerName = name
-        self.numberOfInputs = numberOfInputs
-        self.numberOfOutputs = numberOfOutputs
-    }
-    
     public init(name:String, numberOfInputs:Int) {
         self.transformerName = name
         self.numberOfInputs = numberOfInputs
-        self.numberOfOutputs = numberOfInputs
     }
     
     open var countGates:Int {
@@ -71,6 +67,11 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
             !entry.contains { $0.indices.contains { $0 == input } }
         }
         return self
+    }
+    
+    open func appendNewInput(transformer: UnaryQuBitTransformer) throws {
+        self.numberOfInputs += 1
+        try self.append(transformer: transformer, atTime: 0, forInputAtIndex: self.numberOfInputs-1)
     }
     
     open func append(transformers: (transformer:QuBitTransformer, time:Int, inputIndices:[Int])...) throws {
@@ -262,7 +263,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
     }
     
     open var description: String {
-        var result = "\(self.transformerName) (inputs: \(numberOfInputs), outputs: \(numberOfOutputs)):\n"
+        var result = "\(self.transformerName) (inputs/outputs: \(numberOfInputs)):\n"
         for time in self.timeline.keys.sorted(by: <) {
             let entries = self.timeline[time]!
             result += "\t\(time): "
@@ -278,7 +279,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
 }
 
 public func ==(left:QuCircuit, right:QuCircuit) -> Bool {
-    if left.transformerName == right.transformerName && left.numberOfInputs == right.numberOfInputs && left.numberOfOutputs == right.numberOfOutputs {
+    if left.transformerName == right.transformerName && left.numberOfInputs == right.numberOfInputs {
         let leftGrid = left.transformationMatrix.contents
         let rightGrid = right.transformationMatrix.contents
         
