@@ -69,11 +69,15 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         _transformationMatrix = nil
     }
     
-    open func clearGates(input: Int) -> QuCircuit {
+    open func clear() {
+        self.numberOfInputs = 1
+        self.timeline = [:]
+    }
+    
+    open func clearGates(input: Int) {
         self.timeline = self.timeline.filter { (_, entry) in
             !entry.contains { $0.indices.contains { $0 == input } }
         }
-        return self
     }
     
     open func appendNewInput(transformer: UnaryQuBitTransformer) throws {
