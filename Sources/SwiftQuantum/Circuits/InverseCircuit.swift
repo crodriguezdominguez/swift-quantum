@@ -9,7 +9,7 @@
 import Foundation
 
 open class InverseCircuit : QuCircuit {
-    public init(circuit:QuCircuit) {
+    public init(of circuit:QuCircuit) {
         let trimmedString = circuit.transformerName.trimmingCharacters(in: CharacterSet(charactersIn: "|"))
         
         super.init(name: "|Inv\(trimmedString)|", numberOfInputs: circuit.numberOfInputs)
@@ -31,5 +31,5 @@ open class InverseCircuit : QuCircuit {
 }
 
 public prefix func !(circuit:QuCircuit) -> QuCircuit {
-    return InverseCircuit(circuit: circuit)
+    return InverseCircuit(of: circuit)
 }

@@ -52,6 +52,13 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         self.numberOfInputs = numberOfInputs
     }
     
+    public init(from circuit: QuCircuit) {
+        self.transformerName = circuit.transformerName
+        self.numberOfInputs = circuit.numberOfInputs
+        self.timeline = circuit.timeline
+        self._transformationMatrix = circuit._transformationMatrix
+    }
+    
     open var countGates:Int {
         return timeline.reduce(0) { (result, entry) in
             result+entry.1.count
