@@ -451,14 +451,14 @@ class QuantumCircuitsTests : XCTestCase {
             let gate = HadamardGate()
             
             let controlledX = UniversalControlledGate(gate: gate)
-            let refCircuit = QuCircuit(name: "Ref", numberOfInputs: 4, numberOfOutputs: 4)
+            let refCircuit = QuCircuit(name: "Ref", numberOfInputs: 4)
             try refCircuit.append(transformers:
                                 (transformer: controlledX, time: 0, inputIndices: [0, 1]),
                                 (transformer: controlledX, time: 1, inputIndices: [0, 2]),
                                 (transformer: controlledX, time: 2, inputIndices: [0, 3]))
             let refResult = try refCircuit.transform(input: QuRegister(quBits: .excited, .grounded, .grounded, .grounded))
             
-            let multiXCircuit = QuCircuit(name: "Test", numberOfInputs: 3, numberOfOutputs: 3)
+            let multiXCircuit = QuCircuit(name: "Test", numberOfInputs: 3)
             try multiXCircuit.append(transformers:
                                         (transformer: gate, time: 0, inputIndices: [0]),
                                         (transformer: gate, time: 0, inputIndices: [1]),

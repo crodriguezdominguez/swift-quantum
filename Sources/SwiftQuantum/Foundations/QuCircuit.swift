@@ -8,10 +8,10 @@
 
 import Foundation
 
-open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransformer {
-    open internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
-    open var transformerName:String
-    open fileprivate(set) var numberOfInputs:Int
+open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransformer, ObservableObject {
+    @Published open internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
+    @Published open var transformerName:String
+    @Published open fileprivate(set) var numberOfInputs:Int
     
     fileprivate var _transformationMatrix: QuAmplitudeMatrix? = nil
     
