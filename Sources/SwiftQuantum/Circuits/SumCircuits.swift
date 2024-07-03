@@ -82,10 +82,6 @@ open class HalfTwoQuBitsAdderCircuit : QuCircuit {
         fatalError("You must use the init() constructor for this circuit")
     }
     
-    public override init(name: String, numberOfInputs: Int, numberOfOutputs: Int) {
-        fatalError("You must use the init() constructor for this circuit")
-    }
-    
     open func add(first:QuBit, second:QuBit) -> (result:QuBit, carry:QuBit) {
         let matrix = try! self.transform(input: QuRegister(quBits: first, second, .grounded))
         let qubits = try! QuMeasurer(input: matrix).mostProbableQuBits().quBits
@@ -107,10 +103,6 @@ open class HalfTwoQuBitsSubtractorCircuit : QuCircuit {
     }
     
     public override init(name: String, numberOfInputs: Int) {
-        fatalError("You must use the init() constructor for this circuit")
-    }
-    
-    public override init(name: String, numberOfInputs: Int, numberOfOutputs: Int) {
         fatalError("You must use the init() constructor for this circuit")
     }
     
@@ -138,10 +130,6 @@ open class FullTwoQuBitsAdderCircuit : QuCircuit {
         fatalError("You must use the init() constructor for this circuit")
     }
     
-    public override init(name: String, numberOfInputs: Int, numberOfOutputs: Int) {
-        fatalError("You must use the init() constructor for this circuit")
-    }
-    
     open func add(first:QuBit, second:QuBit, carry:QuBit) -> (result:QuBit, carry:QuBit) {
         let matrix = try! self.transform(input: QuRegister(quBits: first, second, carry, .grounded))
         let qubits = try! QuMeasurer(input: matrix).mostProbableQuBits().quBits
@@ -161,10 +149,6 @@ open class FullTwoQuBitsSubtractorCircuit : QuCircuit {
     }
     
     public override init(name: String, numberOfInputs: Int) {
-        fatalError("You must use the init() constructor for this circuit")
-    }
-    
-    public override init(name: String, numberOfInputs: Int, numberOfOutputs: Int) {
         fatalError("You must use the init() constructor for this circuit")
     }
     

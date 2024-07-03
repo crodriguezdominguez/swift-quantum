@@ -158,12 +158,11 @@ public struct QuCircuitSerializer {
         let error = NSError(domain: "Quantum Circuit IO", code: 100, userInfo: [NSLocalizedDescriptionKey: "The circuit representation is invalid"])
         
         guard let transformerName = json["name"] as? String,
-            let numberOfInputs = json["inputs"] as? Int,
-            let numberOfOutputs = json["outputs"] as? Int else {
+            let numberOfInputs = json["inputs"] as? Int else {
                 throw error
         }
         
-        let circuit = QuCircuit(name: transformerName, numberOfInputs: numberOfInputs, numberOfOutputs: numberOfOutputs)
+        let circuit = QuCircuit(name: transformerName, numberOfInputs: numberOfInputs)
         
         guard let timeline = json["timeline"] as? [[String:AnyObject]] else {
             throw error
@@ -199,12 +198,11 @@ public struct QuCircuitSerializer {
         let error = NSError(domain: "Quantum Circuit IO", code: 100, userInfo: [NSLocalizedDescriptionKey: "The circuit representation is invalid"])
         
         guard let name = contents["name"] as? String,
-            let numberOfInputs = contents["inputs"] as? Int,
-            let numberOfOutputs = contents["outputs"] as? Int else {
+            let numberOfInputs = contents["inputs"] as? Int else {
                 throw error
         }
         
-        let circuit = QuCircuit(name: name, numberOfInputs: numberOfInputs, numberOfOutputs: numberOfOutputs)
+        let circuit = QuCircuit(name: name, numberOfInputs: numberOfInputs)
         
         guard let json = contents["implementation"] as? [String:AnyObject] else {
             throw error
