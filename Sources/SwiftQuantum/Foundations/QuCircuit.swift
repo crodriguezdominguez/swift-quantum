@@ -75,8 +75,15 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
     }
     
     open func clearGates(input: Int) {
-        self.timeline = self.timeline.filter { (_, entry) in
-            !entry.contains { $0.indices.contains { $0 == input } }
+        for (key, entries) in timeline {
+            let newEntries = entries.filter { (_, indices) in
+                indices.contains{ $0 == input }
+            }
+            if newEntries.isEmpty {
+                timeline.removeValue(forKey: key)
+            } else {
+                timeline[key] = newEntries
+            }
         }
     }
     
