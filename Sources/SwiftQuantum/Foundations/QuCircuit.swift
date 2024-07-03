@@ -9,7 +9,6 @@
 import Foundation
 
 open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransformer {
-    fileprivate var matrix:QuAmplitudeMatrix? = nil
     open internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
     open var transformerName:String
     open fileprivate(set) var numberOfInputs:Int
@@ -67,8 +66,16 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         _transformationMatrix = nil
     }
     
-    open func clear(time: Int) {
-        self.timeline.removeValue(forKey: time)
+    open func remove(input: Int) {
+        self.timeline = self.timeline.filter { (_, entry) in
+            !entry.contains { $0.indices.contains { $0 == input } }
+        }
+        
+        self.numberOfInputs = (self.timeline.flatMap({ (_, value) in
+            value.flatMap{ $0.indices }
+        }).max() ?? 0) + 1
+        
+        self.numberOfOutputs = self.numberOfInputs
     }
     
     open func append(transformers: (transformer:QuBitTransformer, time:Int, inputIndices:[Int])...) throws {
