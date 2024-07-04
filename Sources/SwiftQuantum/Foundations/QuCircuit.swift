@@ -143,10 +143,21 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
        self.reloadCacheTransformationMatrix()
     }
     
-    open func remove(fromTime time:Int, atIndex index:Int) {
+    open func remove(fromTime time:Int, atIndex index: Int) {
         if let entries = self.timeline[time] {
             var entries = entries
             entries.remove(at: index)
+            self.timeline[time] = entries
+        }
+        
+        self.reloadCacheTransformationMatrix()
+    }
+    
+    open func remove(fromTime time:Int, usingInput input: Int) {
+        if let entries = self.timeline[time] {
+            let entries = entries.filter { (_, indices) in
+                !indices.contains { $0 == input }
+            }
             self.timeline[time] = entries
         }
         
