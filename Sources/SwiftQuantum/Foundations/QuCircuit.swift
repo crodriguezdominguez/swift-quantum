@@ -87,6 +87,13 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         }
     }
     
+    open func replaceWithContents(of circuit: QuCircuit) {
+        self.timeline = circuit.timeline
+        self.transformerName = circuit.transformerName
+        self.numberOfInputs = circuit.numberOfInputs
+        self._transformationMatrix = circuit._transformationMatrix
+    }
+    
     open func appendNewInput(transformer: UnaryQuBitTransformer) throws {
         self.numberOfInputs += 1
         try self.append(transformer: transformer, atTime: 0, forInputAtIndex: self.numberOfInputs-1)
