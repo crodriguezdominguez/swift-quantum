@@ -24,7 +24,7 @@ class QuantumCircuitsTests : XCTestCase {
         let quBit2 = QuBit.excited
         
         do {
-            let circuit = QuCircuit(name: "Test Circuit", numberOfInputs: 2)
+            var circuit = QuCircuit(name: "Test Circuit", numberOfInputs: 2)
             try circuit.append(transformers: (transformer: PauliYGate(), time: 0, inputIndices:[1]),
                                (transformer: PauliYGate(), time: 0, inputIndices:[0]),
                                (transformer: SwapGate(), time: 1, inputIndices:[0,1]),
@@ -48,7 +48,7 @@ class QuantumCircuitsTests : XCTestCase {
         let quBit2 = QuBit.excited
         
         do {
-            let circuit = QuCircuit(name: "Test Circuit", numberOfInputs: 2)
+            var circuit = QuCircuit(name: "Test Circuit", numberOfInputs: 2)
             try circuit.append(transformers: (transformer: PauliYGate(), time: 0, inputIndices:[1]),
                                (transformer: PauliYGate(), time: 0, inputIndices:[0]),
                                (transformer: SwapGate(), time: 1, inputIndices:[0,1]),
@@ -60,7 +60,7 @@ class QuantumCircuitsTests : XCTestCase {
             
             XCTAssertTrue(result1 == result2)
             
-            let quft = QuFTGate(numberOfInputs: 5).circuitImplementation
+            let quft = QuFTGate(numberOfInputs: 5).quCircuit
             let result3 = try quft.transform(input: QuRegister(quBits: quBit1, quBit2, quBit1, quBit2, quBit1))
             let result4 = try quft.transformationMatrix*QuBit.matrixRepresentation(of: quBit1, quBit2, quBit1, quBit2, quBit1)
             
@@ -78,7 +78,7 @@ class QuantumCircuitsTests : XCTestCase {
         do {
             let invControlledResult = ControlledNotGate().transform(input: (quBit2, quBit1))
             
-            let circuit = QuCircuit(name: "InvCNOT Circuit", numberOfInputs: 2)
+            var circuit = QuCircuit(name: "InvCNOT Circuit", numberOfInputs: 2)
             try circuit.append(transformers: (transformer: HadamardGate(), time: 0, inputIndices:[0]),
                                (transformer: HadamardGate(), time: 0, inputIndices:[1]),
                                (transformer: ControlledNotGate(), time: 1, inputIndices:[0, 1]),
@@ -105,7 +105,7 @@ class QuantumCircuitsTests : XCTestCase {
             let swappedQuBits = SwapGate().transform(input: (quBit1, quBit2))
             let swappedQuBits2 = SwapGate().transform(input: (quBit2, quBit1))
             
-            let circuit = SwapGate().circuitImplementation
+            let circuit = SwapGate().quCircuit
             let result1 = try circuit.transform(input: QuRegister(quBits: quBit1, quBit2))
             let result2 = try circuit.transform(input: QuRegister(quBits: quBit2, quBit1))
             
@@ -117,7 +117,7 @@ class QuantumCircuitsTests : XCTestCase {
     }
     
     func testQFT2() {
-        let circuit = QuFTGate(numberOfInputs:2).circuitImplementation
+        let circuit = QuFTGate(numberOfInputs:2).quCircuit
         
         //00
         let register1 = QuRegister(quBits: QuBit.grounded, QuBit.grounded)
@@ -161,7 +161,7 @@ class QuantumCircuitsTests : XCTestCase {
     }
     
     func testQFT3() {
-        let circuit = QuFTGate(numberOfInputs:3).circuitImplementation
+        let circuit = QuFTGate(numberOfInputs:3).quCircuit
         
         //000
         let register1 = QuRegister(quBits: QuBit.grounded, QuBit.grounded, QuBit.grounded)
@@ -205,7 +205,7 @@ class QuantumCircuitsTests : XCTestCase {
     }
     
     func testQFT4() {
-        let circuit = QuFTGate(numberOfInputs:4).circuitImplementation
+        let circuit = QuFTGate(numberOfInputs:4).quCircuit
         
         //0000
         let register1 = QuRegister(quBits: .grounded, .grounded, .grounded, .grounded)
@@ -249,8 +249,8 @@ class QuantumCircuitsTests : XCTestCase {
     }
     
     func testInverseQFTCircuitOfQFTCircuitIsEqualToInitialInput() {
-        let circuit = QuFTGate(numberOfInputs: 4).circuitImplementation
-        let invCircuit = QuFTGate(numberOfInputs: 4, inverse: true).circuitImplementation
+        var circuit = QuFTGate(numberOfInputs: 4).quCircuit
+        let invCircuit = QuFTGate(numberOfInputs: 4, inverse: true).quCircuit
         
         do {
             let input = QuRegister(quBits: .grounded, .excited, .grounded, .excited)
@@ -270,7 +270,7 @@ class QuantumCircuitsTests : XCTestCase {
     func testQFTTransformationMatrixEqualsItsCircuitImplementation() {
         let maxAllowedError = 0.000000000001 //we are flexible, since there can be a lot of precision errors
         
-        let qft1 = QuFTGate(numberOfInputs: 3).circuitImplementation
+        let qft1 = QuFTGate(numberOfInputs: 3).quCircuit
         let matrix1 = QuFTGate(numberOfInputs: 3).transformationMatrix
         
         for i in 0..<matrix1.rows {
@@ -279,7 +279,7 @@ class QuantumCircuitsTests : XCTestCase {
             }
         }
         
-        let qft2 = QuFTGate(numberOfInputs: 4).circuitImplementation
+        let qft2 = QuFTGate(numberOfInputs: 4).quCircuit
         let matrix2 = QuFTGate(numberOfInputs: 4).transformationMatrix
         
         for i in 0..<matrix2.rows {
@@ -292,7 +292,7 @@ class QuantumCircuitsTests : XCTestCase {
     func testInvQFTTransformationMatrixEqualsItsCircuitImplementation() {
         let maxAllowedError = 0.000000000001 //we are flexible, since there can be a lot of precision errors
         
-        let qft1 = QuFTGate(numberOfInputs: 3, inverse: true).circuitImplementation
+        let qft1 = QuFTGate(numberOfInputs: 3, inverse: true).quCircuit
         let matrix1 = QuFTGate(numberOfInputs: 3, inverse: true).transformationMatrix
         
         for i in 0..<matrix1.rows {
@@ -301,7 +301,7 @@ class QuantumCircuitsTests : XCTestCase {
             }
         }
         
-        let qft2 = QuFTGate(numberOfInputs: 4, inverse: true).circuitImplementation
+        let qft2 = QuFTGate(numberOfInputs: 4, inverse: true).quCircuit
         let matrix2 = QuFTGate(numberOfInputs: 4, inverse: true).transformationMatrix
         
         for i in 0..<matrix2.rows {
@@ -318,20 +318,20 @@ class QuantumCircuitsTests : XCTestCase {
         let pi8 = UniversalControlledGate(gate: PhaseGate(parameter: .pi / 8.0))
         let swap = SwapGate()
         
-        let quft1 = QuCircuit(name: "|QuFT-1|", numberOfInputs: 1)
+        var quft1 = QuCircuit(name: "|QuFT-1|", numberOfInputs: 1)
         try! quft1.append(transformer: h, atTime: 0, forInputAtIndices: [0])
         
-        XCTAssertTrue(quft1 == QuFTGate(numberOfInputs:1).circuitImplementation)
+        XCTAssertTrue(quft1 == QuFTGate(numberOfInputs:1).quCircuit)
         
-        let quft2 = QuCircuit(name: "|QuFT-2|", numberOfInputs: 2)
+        var quft2 = QuCircuit(name: "|QuFT-2|", numberOfInputs: 2)
         try! quft2.append(transformer: h, atTime: 0, forInputAtIndices: [0])
         try! quft2.append(transformer: pi2, atTime: 1, forInputAtIndices: [1, 0])
         try! quft2.append(transformer: h, atTime: 2, forInputAtIndices: [1])
         try! quft2.append(transformer: swap, atTime: 3, forInputAtIndices: [0, 1])
         
-        XCTAssertTrue(quft2 == QuFTGate(numberOfInputs:2).circuitImplementation)
+        XCTAssertTrue(quft2 == QuFTGate(numberOfInputs:2).quCircuit)
         
-        let quft3 = QuCircuit(name: "|QuFT-3|", numberOfInputs: 3)
+        var quft3 = QuCircuit(name: "|QuFT-3|", numberOfInputs: 3)
         try! quft3.append(transformer: h, atTime: 0, forInputAtIndices: [0])
         try! quft3.append(transformer: pi2, atTime: 1, forInputAtIndices: [1, 0])
         try! quft3.append(transformer: pi4, atTime: 2, forInputAtIndices: [2, 0])
@@ -343,9 +343,9 @@ class QuantumCircuitsTests : XCTestCase {
         
         try! quft3.append(transformer: swap, atTime: 6, forInputAtIndices: [0, 2])
         
-        XCTAssertTrue(quft3 == QuFTGate(numberOfInputs:3).circuitImplementation)
+        XCTAssertTrue(quft3 == QuFTGate(numberOfInputs:3).quCircuit)
         
-        let quft4 = QuCircuit(name: "|QuFT-4|", numberOfInputs: 4)
+        var quft4 = QuCircuit(name: "|QuFT-4|", numberOfInputs: 4)
         try! quft4.append(transformer: h, atTime: 0, forInputAtIndices: [0])
         try! quft4.append(transformer: pi2, atTime: 1, forInputAtIndices: [1, 0])
         try! quft4.append(transformer: pi4, atTime: 2, forInputAtIndices: [2, 0])
@@ -363,7 +363,7 @@ class QuantumCircuitsTests : XCTestCase {
         try! quft4.append(transformer: swap, atTime: 10, forInputAtIndices: [0, 3])
         try! quft4.append(transformer: swap, atTime: 11, forInputAtIndices: [1, 2])
         
-        XCTAssertTrue(quft4 == QuFTGate(numberOfInputs:4).circuitImplementation)
+        XCTAssertTrue(quft4 == QuFTGate(numberOfInputs:4).quCircuit)
     }
     
     func testSimpleOracleCircuitsForGroverAlgorithm() {
@@ -372,7 +372,7 @@ class QuantumCircuitsTests : XCTestCase {
         
         do{
             //find a 7
-            let oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
+            var oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
             try oracleCircuit.append(transformer: x, atTime: 0, forInputAtIndices: [0])
             try oracleCircuit.append(transformer: cNot, atTime: 1, forInputAtIndices: [0,1,2,3,4])
             try oracleCircuit.append(transformer: x, atTime: 2, forInputAtIndices: [0])
@@ -386,7 +386,7 @@ class QuantumCircuitsTests : XCTestCase {
             XCTAssertTrue(prob2["01110"] == 1.0) //a not is applied to the last bit
             
             //find a 5
-            let oracleCircuit2 = QuCircuit(name: "Oracle-5", numberOfInputs: 5)
+            var oracleCircuit2 = QuCircuit(name: "Oracle-5", numberOfInputs: 5)
             try oracleCircuit2.append(transformer: x, atTime: 0, forInputAtIndices: [0])
             try oracleCircuit2.append(transformer: x, atTime: 0, forInputAtIndices: [2])
             try oracleCircuit2.append(transformer: cNot, atTime: 1, forInputAtIndices: [0,1,2,3,4])
@@ -411,7 +411,7 @@ class QuantumCircuitsTests : XCTestCase {
         
         do{
             //find a 7
-            let oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
+            var oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
             try oracleCircuit.append(transformer: x, atTime: 0, forInputAtIndices: [0])
             try oracleCircuit.append(transformer: cNot, atTime: 1, forInputAtIndices: [0,1,2,3,4])
             try oracleCircuit.append(transformer: x, atTime: 2, forInputAtIndices: [0])
@@ -426,7 +426,7 @@ class QuantumCircuitsTests : XCTestCase {
             XCTAssertTrue(maxProb > 0.95)
             
             //find a 5
-            let oracleCircuit2 = QuCircuit(name: "Oracle-5", numberOfInputs: 5)
+            var oracleCircuit2 = QuCircuit(name: "Oracle-5", numberOfInputs: 5)
             try oracleCircuit2.append(transformer: x, atTime: 0, forInputAtIndices: [0])
             try oracleCircuit2.append(transformer: x, atTime: 0, forInputAtIndices: [2])
             try oracleCircuit2.append(transformer: cNot, atTime: 1, forInputAtIndices: [0,1,2,3,4])
@@ -451,14 +451,14 @@ class QuantumCircuitsTests : XCTestCase {
             let gate = HadamardGate()
             
             let controlledX = UniversalControlledGate(gate: gate)
-            let refCircuit = QuCircuit(name: "Ref", numberOfInputs: 4)
+            var refCircuit = QuCircuit(name: "Ref", numberOfInputs: 4)
             try refCircuit.append(transformers:
                                 (transformer: controlledX, time: 0, inputIndices: [0, 1]),
                                 (transformer: controlledX, time: 1, inputIndices: [0, 2]),
                                 (transformer: controlledX, time: 2, inputIndices: [0, 3]))
             let refResult = try refCircuit.transform(input: QuRegister(quBits: .excited, .grounded, .grounded, .grounded))
             
-            let multiXCircuit = QuCircuit(name: "Test", numberOfInputs: 3)
+            var multiXCircuit = QuCircuit(name: "Test", numberOfInputs: 3)
             try multiXCircuit.append(transformers:
                                         (transformer: gate, time: 0, inputIndices: [0]),
                                         (transformer: gate, time: 0, inputIndices: [1]),
@@ -515,12 +515,12 @@ class QuantumCircuitsTests : XCTestCase {
         let cNot = MultiControlMultiTargetControlledGate(numberOfControlInputs: 3, targetGate: ControlledNotGate())
         
         do {
-            let oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
+            var oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
             try oracleCircuit.append(transformer: x, atTime: 0, forInputAtIndices: [0])
             try oracleCircuit.append(transformer: cNot, atTime: 1, forInputAtIndices: [0,1,2,3,4])
             try oracleCircuit.append(transformer: x, atTime: 2, forInputAtIndices: [0])
             
-            let testCircuit1 = QuFTGate(numberOfInputs: 5).circuitImplementation
+            let testCircuit1 = QuFTGate(numberOfInputs: 5).quCircuit
             let testCircuit2 = GroverCircuit(oracle: oracleCircuit)
             
             let deserializedCircuit1 = try QuCircuitSerializer.deserialize(QuCircuitSerializer.serialize(testCircuit1))
@@ -797,7 +797,7 @@ class QuantumCircuitsTests : XCTestCase {
     }
     
     func testComplexSimulationPerformance() {
-        measure{
+        measure {
             let precision = 4
             let errorProbability = 0.1
             let maxAllowedError = 1.0/pow(2.0, Double(precision-1))
@@ -815,7 +815,7 @@ class QuantumCircuitsTests : XCTestCase {
         let cNot = MultiControlMultiTargetControlledGate(numberOfControlInputs: 3, targetGate: ControlledNotGate())
         
         do {
-            let oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
+            var oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
             try oracleCircuit.append(transformer: x, atTime: 0, forInputAtIndices: [0])
             try oracleCircuit.append(transformer: cNot, atTime: 1, forInputAtIndices: [0,1,2,3,4])
             try oracleCircuit.append(transformer: x, atTime: 2, forInputAtIndices: [0])
@@ -836,7 +836,7 @@ class QuantumCircuitsTests : XCTestCase {
         let cNot = MultiControlMultiTargetControlledGate(numberOfControlInputs: 3, targetGate: ControlledNotGate())
         
         do {
-            let oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
+            var oracleCircuit = QuCircuit(name: "Oracle-7", numberOfInputs: 5)
             try oracleCircuit.append(transformer: x, atTime: 0, forInputAtIndices: [0])
             try oracleCircuit.append(transformer: cNot, atTime: 1, forInputAtIndices: [0,1,2,3,4])
             try oracleCircuit.append(transformer: x, atTime: 2, forInputAtIndices: [0])

@@ -8,22 +8,23 @@
 
 import Foundation
 
-open class PhaseEstimationCircuit : QuCircuit {
+public struct PhaseEstimationCircuit : QuCircuitRepresentable {
     fileprivate let quBitsOfPrecision:Int
+    public private(set) var quCircuit: QuCircuit
     
-    public required init(operatorGate:QuBitTransformer, quBitsOfPrecision nPrecision:Int, errorProbability:Double) {
+    public init(operatorGate: QuBitTransformer, quBitsOfPrecision nPrecision:Int, errorProbability: Double) {
         let mQuBits = operatorGate.numberOfInputs
         let name = operatorGate.transformerName.trimmingCharacters(in: CharacterSet(charactersIn: "|"))
         self.quBitsOfPrecision = nPrecision + Int(ceil(log2(2.0+(1.0/(2.0*errorProbability)))))
         
-        super.init(name: "|PhaseEstimation-\(name) \(quBitsOfPrecision)-Precision|", numberOfInputs: mQuBits+quBitsOfPrecision)
+        quCircuit = QuCircuit(name: "|PhaseEstimation-\(name) \(quBitsOfPrecision)-Precision|", numberOfInputs: mQuBits+quBitsOfPrecision)
         
         let h = HadamardGate()
         let controlledU = MultiControlMultiTargetControlledGate(numberOfControlInputs: 1, targetGate: operatorGate)
         
         var time = 0
         for k in 0..<quBitsOfPrecision {
-            try! self.append(transformer: h, atTime: time, forInputAtIndices: [k])
+            try! quCircuit.append(transformer: h, atTime: time, forInputAtIndices: [k])
         }
         time += 1
         
@@ -38,28 +39,23 @@ open class PhaseEstimationCircuit : QuCircuit {
             currentMatrix = try! currentMatrix*pow(controlledU.transformationMatrix, exponent: exp-lastExp)
             let indices = [k]+targetQuBits
             let gate = UniversalGate(matrix: currentMatrix, name: gateName, numberOfInputs: controlledU.numberOfInputs, numberOfOutputs: controlledU.numberOfOutputs)
-            try! self.append(transformer: gate, atTime: time, forInputAtIndices: indices)
+            try! quCircuit.append(transformer: gate, atTime: time, forInputAtIndices: indices)
             
             lastExp = exp
             
             time += 1
         }
         
-        try! self.append(transformer: QuFTGate(numberOfInputs: quBitsOfPrecision, inverse: true), atTime: time, forInputAtIndices: [Int](0..<quBitsOfPrecision))
+        try! quCircuit.append(transformer: QuFTGate(numberOfInputs: quBitsOfPrecision, inverse: true), atTime: time, forInputAtIndices: [Int](0..<quBitsOfPrecision))
     }
     
-    public required init() {
-        quBitsOfPrecision = 0
-        super.init()
-    }
-    
-    open func estimatePhase(forOperatorInput input:QuRegister) throws -> (phase:Double, probability:Double) {
+    public func estimatePhase(forOperatorInput input:QuRegister) throws -> (phase:Double, probability:Double) {
         let register = QuRegister(numberOfQuBits: quBitsOfPrecision).append(input)
         return try estimatePhase(for: register.matrixRepresentation())
     }
     
-    open func estimatePhase(for input:QuAmplitudeMatrix) throws -> (phase:Double, probability:Double) {
-        let output = try transform(input: input)
+    public func estimatePhase(for input:QuAmplitudeMatrix) throws -> (phase:Double, probability:Double) {
+        let output = try quCircuit.transform(input: input)
         var (phaseNumerator,prob) = try QuMeasurer(input: output).mostProbableIntegerValue()
         
         //we just take the quBits of precision, not the input for the operator register

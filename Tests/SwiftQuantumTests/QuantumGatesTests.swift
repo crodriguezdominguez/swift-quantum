@@ -157,7 +157,7 @@ class QuantumGatesTests : XCTestCase {
     
     func testXTransformationMatrixIsEqualToItsCircuitImplementation() {
         let x = PauliXGate()
-        XCTAssertTrue(x.transformationMatrix == x.circuitImplementation.transformationMatrix)
+        XCTAssertTrue(x.transformationMatrix == x.quCircuit.transformationMatrix)
     }
     
     func testMultipleControlInputsControlledGateWithTwoInputsIsEqualToOneUniversalControlledGate() {

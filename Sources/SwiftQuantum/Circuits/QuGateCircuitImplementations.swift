@@ -8,13 +8,9 @@
 
 import Foundation
 
-public protocol QuCircuitImplementable {
-    var circuitImplementation: QuCircuit {get}
-}
-
-extension QuFTGate : QuCircuitImplementable {
-    public var circuitImplementation: QuCircuit {
-        let circuit = QuCircuit(name: inverse ? "|InvQuFT-\(numberOfInputs)|" : "|QuFT-\(numberOfInputs)|", numberOfInputs: self.numberOfInputs)
+extension QuFTGate : QuCircuitRepresentable {
+    public var quCircuit: QuCircuit {
+        var circuit = QuCircuit(name: inverse ? "|InvQuFT-\(numberOfInputs)|" : "|QuFT-\(numberOfInputs)|", numberOfInputs: self.numberOfInputs)
         
         let h = HadamardGate()
         
@@ -46,9 +42,17 @@ extension QuFTGate : QuCircuitImplementable {
     }
 }
 
-extension SwapGate : QuCircuitImplementable {
-    public var circuitImplementation: QuCircuit {
-        let circuit = QuCircuit(name: "|Swap|", numberOfInputs: 2)
+extension SwapGate : QuCircuitRepresentable {
+    public var numberOfInputs: Int {
+        2
+    }
+    
+    public var numberOfOutputs: Int {
+        2
+    }
+    
+    public var quCircuit: QuCircuit {
+        var circuit = QuCircuit(name: "|Swap|", numberOfInputs: 2)
         try! circuit.append(transformers: (transformer: ControlledNotGate(), time: 0, inputIndices:[0, 1]),
                            (transformer: ControlledNotGate(), time: 1, inputIndices:[1, 0]),
                            (transformer: ControlledNotGate(), time: 2, inputIndices:[0, 1])
@@ -57,9 +61,17 @@ extension SwapGate : QuCircuitImplementable {
     }
 }
 
-extension PauliXGate : QuCircuitImplementable {
-    public var circuitImplementation: QuCircuit {
-        let circuit = QuCircuit(name: "|X|", numberOfInputs: 1)
+extension PauliXGate : QuCircuitRepresentable {
+    public var numberOfInputs: Int {
+        1
+    }
+    
+    public var numberOfOutputs: Int {
+        1
+    }
+    
+    public var quCircuit: QuCircuit {
+        var circuit = QuCircuit(name: "|X|", numberOfInputs: 1)
         let h = HadamardGate()
         let z = PauliZGate()
         try! circuit.append(transformers: (transformer: h, time: 0, inputIndices:[0]),
@@ -71,9 +83,17 @@ extension PauliXGate : QuCircuitImplementable {
     }
 }
 
-extension PauliZGate : QuCircuitImplementable {
-    public var circuitImplementation: QuCircuit {
-        let circuit = QuCircuit(name: "|Z|", numberOfInputs: 1)
+extension PauliZGate : QuCircuitRepresentable {
+    public var numberOfInputs: Int {
+        1
+    }
+    
+    public var numberOfOutputs: Int {
+        1
+    }
+    
+    public var quCircuit: QuCircuit {
+        var circuit = QuCircuit(name: "|Z|", numberOfInputs: 1)
         let h = HadamardGate()
         let x = PauliXGate()
         try! circuit.append(transformers: (transformer: h, time: 0, inputIndices:[0]),

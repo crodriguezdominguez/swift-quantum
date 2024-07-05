@@ -8,17 +8,20 @@
 
 import Foundation
 
-open class GroverCircuit : QuCircuit {
-    public required init(oracle:QuBitTransformer) {
+public struct GroverCircuit: QuCircuitRepresentable {
+    public private(set) var quCircuit: QuCircuit
+    
+    public init(oracle: QuBitTransformer) {
         let name = oracle.transformerName.trimmingCharacters(in: CharacterSet(charactersIn: "|"))
-        super.init(name: "|Grover-\(oracle.numberOfInputs-1) \(name)|", numberOfInputs: oracle.numberOfInputs)
+        let numberOfInputs = oracle.numberOfInputs
+        quCircuit = QuCircuit(name: "|Grover-\(oracle.numberOfInputs-1) \(name)|", numberOfInputs: oracle.numberOfInputs)
         
         let h = HadamardGate()
-        let groover = self.groverOperator(forNumberOfInputs: numberOfInputs-1)
+        let groover = GroverCircuit.groverOperator(forNumberOfInputs: numberOfInputs-1)
         
         var time = 0
         for k in 0..<numberOfInputs {
-            try! self.append(transformer: h, atTime: time, forInputAtIndices: [k])
+            try! quCircuit.append(transformer: h, atTime: time, forInputAtIndices: [k])
         }
         time += 1
         
@@ -26,30 +29,26 @@ open class GroverCircuit : QuCircuit {
         let inputs = [Int](0..<numberOfInputs)
         let reducedInputs = [Int](0..<numberOfInputs-1)
         for _ in 0..<iterations {
-            try! self.append(transformer: oracle, atTime: time, forInputAtIndices: inputs)
+            try! quCircuit.append(transformer: oracle, atTime: time, forInputAtIndices: inputs)
             time += 1
             
-            try! self.append(transformer: groover, atTime: time, forInputAtIndices: reducedInputs)
+            try! quCircuit.append(transformer: groover, atTime: time, forInputAtIndices: reducedInputs)
             time += 1
         }
         
-        try! self.append(transformer: h, atTime: time, forInputAtIndices: [numberOfInputs-1])
-        try! self.append(transformer: PauliXGate(), atTime: time+1, forInputAtIndices: [numberOfInputs-1])
+        try! quCircuit.append(transformer: h, atTime: time, forInputAtIndices: [numberOfInputs-1])
+        try! quCircuit.append(transformer: PauliXGate(), atTime: time+1, forInputAtIndices: [numberOfInputs-1])
     }
     
-    open func evaluate() -> QuAmplitudeMatrix {
+    public func evaluate() -> QuAmplitudeMatrix {
         var quBits = [QuBit](repeating: .grounded, count: self.numberOfInputs-1)
         quBits.append(.excited)
         
-        return try! transform(input: QuRegister(quBits: quBits))
+        return try! quCircuit.transform(input: QuRegister(quBits: quBits))
     }
     
-    public required init() {
-        super.init()
-    }
-    
-    fileprivate func groverOperator(forNumberOfInputs numberOfInputs:Int) -> QuCircuit {
-        let circuit = QuCircuit(name: "Grov", numberOfInputs: numberOfInputs)
+    public static func groverOperator(forNumberOfInputs numberOfInputs:Int) -> QuCircuit {
+        var circuit = QuCircuit(name: "Grov", numberOfInputs: numberOfInputs)
         let h = HadamardGate()
         let x = PauliXGate()
         let cz = MultiControlMultiTargetControlledGate(numberOfControlInputs: numberOfInputs-1, targetGate: PauliZGate())

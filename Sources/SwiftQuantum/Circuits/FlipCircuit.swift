@@ -8,17 +8,15 @@
 
 import Foundation
 
-open class FlipCircuit : QuCircuit {
-    public required init(numberOfInputs:Int) {
-        super.init(name: "|Flip-\(numberOfInputs)|", numberOfInputs: numberOfInputs)
+public struct FlipCircuit: QuCircuitRepresentable {
+    public private(set) var quCircuit: QuCircuit
+    
+    public init(numberOfInputs:Int) {
+        quCircuit = QuCircuit(name: "|Flip-\(numberOfInputs)|", numberOfInputs: numberOfInputs)
         
         let swap = SwapGate()
         for k in 0..<numberOfInputs/2 {
-            try! self.append(transformer: swap, atTime: 0, forInputAtIndices: [k, numberOfInputs-k-1])
+            try! quCircuit.append(transformer: swap, atTime: 0, forInputAtIndices: [k, numberOfInputs-k-1])
         }
-    }
-    
-    public required init() {
-        super.init()
     }
 }

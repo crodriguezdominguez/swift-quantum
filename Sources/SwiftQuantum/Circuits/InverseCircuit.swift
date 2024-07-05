@@ -8,28 +8,26 @@
 
 import Foundation
 
-open class InverseCircuit : QuCircuit {
-    public init(of circuit:QuCircuit) {
-        let trimmedString = circuit.transformerName.trimmingCharacters(in: CharacterSet(charactersIn: "|"))
+public struct InverseCircuit : QuCircuitRepresentable {
+    public private(set) var quCircuit: QuCircuit
+    
+    public init(of input: any QuCircuitRepresentable) {
+        let trimmedString = input.quCircuit.transformerName.trimmingCharacters(in: CharacterSet(charactersIn: "|"))
         
-        super.init(name: "|Inv\(trimmedString)|", numberOfInputs: circuit.numberOfInputs)
+        quCircuit = QuCircuit(name: "|Inv\(trimmedString)|", numberOfInputs: input.numberOfInputs)
         
-        let maxTime = circuit.timeline.keys.max()!
-        var newTimeline = circuit.timeline
+        let maxTime = input.quCircuit.timeline.keys.max()!
+        var newTimeline = input.quCircuit.timeline
         
-        for key in circuit.timeline.keys {
+        for key in input.quCircuit.timeline.keys {
             let newKey = maxTime-key
-            newTimeline[newKey] = circuit.timeline[key]
+            newTimeline[newKey] = input.quCircuit.timeline[key]
         }
         
-        self.timeline = newTimeline
-    }
-    
-    public required init() {
-        super.init()
+        quCircuit.timeline = newTimeline
     }
 }
 
-public prefix func !(circuit:QuCircuit) -> QuCircuit {
+public prefix func !(circuit: any QuCircuitRepresentable) -> some QuCircuitRepresentable {
     return InverseCircuit(of: circuit)
 }
