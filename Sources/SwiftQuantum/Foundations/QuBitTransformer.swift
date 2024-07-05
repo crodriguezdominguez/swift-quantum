@@ -9,29 +9,29 @@
 import Foundation
 
 public protocol QuBitTransformer : CustomStringConvertible {
-    var transformerName:String {get}
-    var transformationMatrix:QuAmplitudeMatrix {get}
+    var transformerName: String {get}
+    var transformationMatrix: QuAmplitudeMatrix {get}
     var numberOfInputs:Int{get}
     var numberOfOutputs:Int{get} //to support multiplexers and coders
     
     init()
 }
 
-extension QuBitTransformer {
-    public func transform(input:QuAmplitudeMatrixConvertible) throws -> QuAmplitudeMatrix {
+public extension QuBitTransformer {
+    func transform(input:QuAmplitudeMatrixConvertible) throws -> QuAmplitudeMatrix {
         return try self.transform(input: input.matrixRepresentation())
     }
     
-    public func transform(input:QuAmplitudeMatrix) throws -> QuAmplitudeMatrix {
+    func transform(input:QuAmplitudeMatrix) throws -> QuAmplitudeMatrix {
         return try self.transformationMatrix*input
     }
     
-    public var description:String {
+    var description:String {
         return self.transformerName
     }
 }
 
-func ==<T : QuBitTransformer>(left:T, right:T) -> Bool {
+public func ==<T : QuBitTransformer>(left:T, right:T) -> Bool {
     return left.transformerName == right.transformerName
 }
 

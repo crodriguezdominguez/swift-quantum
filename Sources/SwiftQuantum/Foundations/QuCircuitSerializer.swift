@@ -11,7 +11,9 @@ import Foundation
 public struct QuCircuitSerializer {
     //MARK: - Serialization
     
-    public static func serialize(_ circuit:QuCircuit) -> String {
+    public static func serialize(_ entry: any QuCircuitRepresentable) -> String {
+        let circuit = entry.quCircuit
+        
         var result = "{\"name\":\"\(circuit.transformerName)\", \"inputs\":\(circuit.numberOfInputs), \"outputs\":\(circuit.numberOfOutputs), \"timeline\":["
         let times = circuit.timeline.keys.sorted(by: <)
         for time in times {
@@ -59,7 +61,7 @@ public struct QuCircuitSerializer {
         return result
     }
     
-    fileprivate static func serialize(transformer:QuBitTransformer, time:Int, indices:[Int]) -> String {
+    fileprivate static func serialize(transformer: QuBitTransformer, time:Int, indices:[Int]) -> String {
         var result = ""
         
         if let circuit = transformer as? QuCircuit {
@@ -83,7 +85,7 @@ public struct QuCircuitSerializer {
         return result
     }
     
-    fileprivate static func jsonRepresentation(_ matrix:QuAmplitudeMatrix) -> String {
+    fileprivate static func jsonRepresentation(_ matrix: QuAmplitudeMatrix) -> String {
         var gridRepresentation = "["
         for complex in matrix.contents {
             let re = String(format: "%.19g", complex.re)
@@ -106,7 +108,7 @@ public struct QuCircuitSerializer {
     
     //MARK: - Deserialization
     
-    public static func deserialize(_ circuitString:String) throws -> QuCircuit {
+    public static func deserialize(_ circuitString: String) throws -> QuCircuit {
         let error = NSError(domain: "Quantum Circuit IO", code: 100, userInfo: [NSLocalizedDescriptionKey: "The circuit representation is invalid"])
         
         if let json = try JSONSerialization.jsonObject(with: circuitString.data(using: String.Encoding.utf8)!, options: .allowFragments) as? [String:AnyObject] {
@@ -162,7 +164,7 @@ public struct QuCircuitSerializer {
                 throw error
         }
         
-        let circuit = QuCircuit(name: transformerName, numberOfInputs: numberOfInputs)
+        var circuit = QuCircuit(name: transformerName, numberOfInputs: numberOfInputs)
         
         guard let timeline = json["timeline"] as? [[String:AnyObject]] else {
             throw error
@@ -202,7 +204,7 @@ public struct QuCircuitSerializer {
                 throw error
         }
         
-        let circuit = QuCircuit(name: name, numberOfInputs: numberOfInputs)
+        var circuit = QuCircuit(name: name, numberOfInputs: numberOfInputs)
         
         guard let json = contents["implementation"] as? [String:AnyObject] else {
             throw error

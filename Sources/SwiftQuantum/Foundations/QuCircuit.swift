@@ -8,22 +8,69 @@
 
 import Foundation
 
-open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransformer, ObservableObject {
-    @Published open internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
-    @Published open var transformerName:String
-    @Published open fileprivate(set) var numberOfInputs:Int
+public protocol QuCircuitRepresentable: CustomStringConvertible, Equatable, MultipleQuBitTransformer {
+    var quCircuit: QuCircuit {get}
+}
+
+public extension QuCircuitRepresentable {
+    var transformerName: String {
+        return quCircuit.transformerName
+    }
     
-    fileprivate var _transformationMatrix: QuAmplitudeMatrix? = nil
+    var description: String {
+        return quCircuit.description
+    }
     
-    public var numberOfOutputs: Int {
+    var numberOfInputs: Int {
+        return self.quCircuit.numberOfInputs
+    }
+    
+    var transformationMatrix: QuAmplitudeMatrix {
+        return self.quCircuit.transformationMatrix
+    }
+    
+    var numberOfOutputs: Int {
         numberOfInputs
     }
     
-    open var transformationMatrix: QuAmplitudeMatrix {
+    init() {
+        fatalError("init() constructor can not be used in circuits")
+    }
+}
+
+public struct QuCircuit : QuCircuitRepresentable {
+    public internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
+    public var transformerName:String
+    public fileprivate(set) var numberOfInputs:Int
+    
+    fileprivate var _transformationMatrix: QuAmplitudeMatrix? = nil
+    
+    public var quCircuit: QuCircuit {
+        return self
+    }
+    
+    public var transformationMatrix: QuAmplitudeMatrix {
         if let tr = _transformationMatrix {
             return tr
         }
         
+        return calculateTransformationMatrix()
+    }
+    
+    public init(name:String, numberOfInputs:Int) {
+        self.transformerName = name
+        self.numberOfInputs = numberOfInputs
+    }
+    
+    public init(from representable: any QuCircuitRepresentable) {
+        let circuit = representable.quCircuit
+        self.transformerName = circuit.transformerName
+        self.numberOfInputs = circuit.numberOfInputs
+        self.timeline = circuit.timeline
+        self._transformationMatrix = circuit._transformationMatrix
+    }
+    
+    fileprivate func calculateTransformationMatrix() -> QuAmplitudeMatrix {
         let size = Int(pow(2.0, Double(numberOfInputs)))
         var x = QuAmplitudeMatrix.identity(size: size).uncompressed()
         let times = self.timeline.keys.sorted(by: <)
@@ -38,43 +85,26 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
             }
         }
         
-        _transformationMatrix = x.compressed()
-        
-        return _transformationMatrix!
+        return x.compressed()
     }
     
-    public required init() {
-        fatalError("init() constructor can not be used in circuits")
-    }
-    
-    public init(name:String, numberOfInputs:Int) {
-        self.transformerName = name
-        self.numberOfInputs = numberOfInputs
-    }
-    
-    public init(from circuit: QuCircuit) {
-        self.transformerName = circuit.transformerName
-        self.numberOfInputs = circuit.numberOfInputs
-        self.timeline = circuit.timeline
-        self._transformationMatrix = circuit._transformationMatrix
-    }
-    
-    open var countGates:Int {
+    public var countGates:Int {
         return timeline.reduce(0) { (result, entry) in
             result+entry.1.count
         }
     }
     
-    fileprivate func reloadCacheTransformationMatrix() {
-        _transformationMatrix = nil
+    fileprivate mutating func reloadCacheTransformationMatrix() {
+        _transformationMatrix = self.calculateTransformationMatrix()
     }
     
-    open func clear() {
+    public mutating func clear() {
         self.numberOfInputs = 1
         self.timeline = [:]
+        self._transformationMatrix = nil
     }
     
-    open func clearGates(input: Int) {
+    public mutating func clearGates(input: Int) {
         for (key, entries) in timeline {
             let newEntries = entries.filter { (_, indices) in
                 !indices.contains{ $0 == input }
@@ -87,19 +117,19 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         }
     }
     
-    open func replaceWithContents(of circuit: QuCircuit) {
+    public mutating func replaceWithContents(of circuit: QuCircuit) {
         self.timeline = circuit.timeline
         self.transformerName = circuit.transformerName
         self.numberOfInputs = circuit.numberOfInputs
         self._transformationMatrix = circuit._transformationMatrix
     }
     
-    open func appendNewInput(transformer: UnaryQuBitTransformer) throws {
+    public mutating func appendNewInput(transformer: UnaryQuBitTransformer) throws {
         self.numberOfInputs += 1
         try self.append(transformer: transformer, atTime: 0, forInputAtIndex: self.numberOfInputs-1)
     }
     
-    open func append(transformers: (transformer:QuBitTransformer, time:Int, inputIndices:[Int])...) throws {
+    public mutating func append(transformers: (transformer:QuBitTransformer, time:Int, inputIndices:[Int])...) throws {
         for entry in transformers {
             try self.append(transformer: entry.transformer, atTime: entry.time, forInputAtIndices: entry.inputIndices)
         }
@@ -107,7 +137,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         self.reloadCacheTransformationMatrix()
     }
     
-    open func append(transformer:UnaryQuBitTransformer, atTime time:Int, forInputAtIndex index:Int) throws {
+    public mutating func append(transformer:UnaryQuBitTransformer, atTime time:Int, forInputAtIndex index:Int) throws {
         guard index < self.numberOfInputs else {
             throw NSError(domain: "Quantum computing", code: 101, userInfo: [NSLocalizedDescriptionKey: "The input index is out of range: The circuit has a limit of \(self.numberOfInputs) inputs"])
         }
@@ -125,7 +155,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         self.reloadCacheTransformationMatrix()
     }
     
-    open func append(transformer:QuBitTransformer, atTime time:Int, forInputAtIndices indices:[Int]) throws {
+    public mutating func append(transformer:QuBitTransformer, atTime time:Int, forInputAtIndices indices:[Int]) throws {
         guard indices.count == transformer.numberOfInputs else {
             throw NSError(domain: "Quantum computing", code: 100, userInfo: [NSLocalizedDescriptionKey: "The amount of inputs of the gate must be equal to the amount of provided indices"])
         }
@@ -150,7 +180,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
        self.reloadCacheTransformationMatrix()
     }
     
-    open func remove(fromTime time:Int, atIndex index: Int) {
+    public mutating func remove(fromTime time:Int, atIndex index: Int) {
         if let entries = self.timeline[time] {
             var entries = entries
             entries.remove(at: index)
@@ -160,7 +190,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         self.reloadCacheTransformationMatrix()
     }
     
-    open func remove(fromTime time:Int, usingInput input: Int) {
+    public mutating func remove(fromTime time:Int, usingInput input: Int) {
         if let entries = self.timeline[time] {
             let entries = entries.filter { (_, indices) in
                 !indices.contains { $0 == input }
@@ -171,19 +201,19 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         self.reloadCacheTransformationMatrix()
     }
     
-    open func transform(input:QuRegister) throws -> QuAmplitudeMatrix {
+    public mutating func transform(input:QuRegister) throws -> QuAmplitudeMatrix {
         return try transform(input: input.matrixRepresentation())
     }
     
-    open func transform(input:QuAmplitudeMatrix) throws -> QuAmplitudeMatrix {
+    public mutating func transform(input:QuAmplitudeMatrix) throws -> QuAmplitudeMatrix {
         return try self.transform(upToStep: self.timeline.count-1, forInput: input)
     }
     
-    open func transform(upToStep maxStep:Int, forInput input:QuRegister) throws -> QuAmplitudeMatrix {
+    public func transform(upToStep maxStep:Int, forInput input:QuRegister) throws -> QuAmplitudeMatrix {
         return try self.transform(upToStep: maxStep, forInput: input.matrixRepresentation())
     }
     
-    open func transform(_ fromStep:Int=0, upToStep maxStep:Int, forInput input:QuAmplitudeMatrix) throws -> QuAmplitudeMatrix {
+    public func transform(_ fromStep:Int=0, upToStep maxStep:Int, forInput input:QuAmplitudeMatrix) throws -> QuAmplitudeMatrix {
         let times = self.timeline.keys.sorted(by: <)
         var x = input.uncompressed()
         if x.rows < x.columns {
@@ -221,7 +251,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         return x.compressed()
     }
     
-    open var countTransformationSteps:Int {
+    public var countTransformationSteps: Int {
         return self.timeline.count
     }
     
@@ -298,7 +328,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
         return result
     }
     
-    open var description: String {
+    public var description: String {
         var result = "\(self.transformerName) (inputs/outputs: \(numberOfInputs)):\n"
         for time in self.timeline.keys.sorted(by: <) {
             let entries = self.timeline[time]!
@@ -314,7 +344,7 @@ open class QuCircuit : CustomStringConvertible, Equatable, MultipleQuBitTransfor
     }
 }
 
-public func ==(left:QuCircuit, right:QuCircuit) -> Bool {
+public func ==(left: QuCircuit, right: QuCircuit) -> Bool {
     if left.transformerName == right.transformerName && left.numberOfInputs == right.numberOfInputs {
         let leftGrid = left.transformationMatrix.contents
         let rightGrid = right.transformationMatrix.contents
@@ -330,3 +360,8 @@ public func ==(left:QuCircuit, right:QuCircuit) -> Bool {
     
     return false
 }
+
+public func ==(left: any QuCircuitRepresentable, right: any QuCircuitRepresentable) -> Bool {
+    return left.quCircuit == right.quCircuit
+}
+
