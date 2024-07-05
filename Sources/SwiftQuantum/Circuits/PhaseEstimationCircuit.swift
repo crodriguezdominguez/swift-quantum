@@ -17,7 +17,7 @@ public struct PhaseEstimationCircuit : QuCircuitRepresentable {
         let name = operatorGate.transformerName.trimmingCharacters(in: CharacterSet(charactersIn: "|"))
         self.quBitsOfPrecision = nPrecision + Int(ceil(log2(2.0+(1.0/(2.0*errorProbability)))))
         
-        quCircuit = QuCircuit(name: "|PhaseEstimation-\(name) \(quBitsOfPrecision)-Precision|", numberOfInputs: mQuBits+quBitsOfPrecision)
+        var quCircuit = QuCircuit(name: "|PhaseEstimation-\(name) \(quBitsOfPrecision)-Precision|", numberOfInputs: mQuBits+quBitsOfPrecision)
         
         let h = HadamardGate()
         let controlledU = MultiControlMultiTargetControlledGate(numberOfControlInputs: 1, targetGate: operatorGate)
@@ -47,6 +47,8 @@ public struct PhaseEstimationCircuit : QuCircuitRepresentable {
         }
         
         try! quCircuit.append(transformer: QuFTGate(numberOfInputs: quBitsOfPrecision, inverse: true), atTime: time, forInputAtIndices: [Int](0..<quBitsOfPrecision))
+        
+        self.quCircuit = quCircuit
     }
     
     public func estimatePhase(forOperatorInput input:QuRegister) throws -> (phase:Double, probability:Double) {
