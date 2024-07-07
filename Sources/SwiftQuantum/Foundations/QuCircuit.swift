@@ -42,17 +42,13 @@ public struct QuCircuit : QuCircuitRepresentable {
     public internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
     public var transformerName:String
     public fileprivate(set) var numberOfInputs:Int
-    
-    fileprivate var _transformationMatrix: QuAmplitudeMatrix? = nil
-    
+        
     public var quCircuit: QuCircuit {
         return self
     }
     
     public var transformationMatrix: QuAmplitudeMatrix {
-        if let tr = _transformationMatrix {
-            return tr
-        }
+        // TODO: create a transformation matrix cache to avoid its recalculation each time it is requested
         
         return calculateTransformationMatrix()
     }
@@ -67,7 +63,6 @@ public struct QuCircuit : QuCircuitRepresentable {
         self.transformerName = circuit.transformerName
         self.numberOfInputs = circuit.numberOfInputs
         self.timeline = circuit.timeline
-        self._transformationMatrix = circuit._transformationMatrix
     }
     
     fileprivate func calculateTransformationMatrix() -> QuAmplitudeMatrix {
@@ -94,14 +89,13 @@ public struct QuCircuit : QuCircuitRepresentable {
         }
     }
     
-    fileprivate mutating func reloadCacheTransformationMatrix() {
-        _transformationMatrix = self.calculateTransformationMatrix()
+    fileprivate mutating func invalidateCacheTransformationMatrix() {
+        // TODO: invalidate the cached transformation matrix to force its recalculation the next time is requested
     }
     
     public mutating func clear() {
         self.numberOfInputs = 1
         self.timeline = [:]
-        self._transformationMatrix = nil
     }
     
     public mutating func clearGates(input: Int) {
@@ -121,7 +115,6 @@ public struct QuCircuit : QuCircuitRepresentable {
         self.timeline = circuit.timeline
         self.transformerName = circuit.transformerName
         self.numberOfInputs = circuit.numberOfInputs
-        self._transformationMatrix = circuit._transformationMatrix
     }
     
     public mutating func appendNewInput(transformer: UnaryQuBitTransformer) throws {
@@ -134,7 +127,7 @@ public struct QuCircuit : QuCircuitRepresentable {
             try self.append(transformer: entry.transformer, atTime: entry.time, forInputAtIndices: entry.inputIndices)
         }
         
-        self.reloadCacheTransformationMatrix()
+        self.invalidateCacheTransformationMatrix()
     }
     
     public mutating func append(transformer:UnaryQuBitTransformer, atTime time:Int, forInputAtIndex index:Int) throws {
@@ -152,7 +145,7 @@ public struct QuCircuit : QuCircuitRepresentable {
             timeline[time] = newEntries
         }
         
-        self.reloadCacheTransformationMatrix()
+        self.invalidateCacheTransformationMatrix()
     }
     
     public mutating func append(transformer:QuBitTransformer, atTime time:Int, forInputAtIndices indices:[Int]) throws {
@@ -177,7 +170,7 @@ public struct QuCircuit : QuCircuitRepresentable {
             timeline[time] = newEntries
         }
         
-       self.reloadCacheTransformationMatrix()
+       self.invalidateCacheTransformationMatrix()
     }
     
     public mutating func remove(fromTime time:Int, atIndex index: Int) {
@@ -187,7 +180,7 @@ public struct QuCircuit : QuCircuitRepresentable {
             self.timeline[time] = entries
         }
         
-        self.reloadCacheTransformationMatrix()
+        self.invalidateCacheTransformationMatrix()
     }
     
     public mutating func remove(fromTime time:Int, usingInput input: Int) {
@@ -198,7 +191,7 @@ public struct QuCircuit : QuCircuitRepresentable {
             self.timeline[time] = entries
         }
         
-        self.reloadCacheTransformationMatrix()
+        self.invalidateCacheTransformationMatrix()
     }
     
     public mutating func transform(input:QuRegister) throws -> QuAmplitudeMatrix {
