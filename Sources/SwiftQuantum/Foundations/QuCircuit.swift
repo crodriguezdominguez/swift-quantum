@@ -38,15 +38,15 @@ public extension QuCircuitRepresentable {
     }
 }
 
-fileprivate class CacheAmplitudeMatrix {
-    var matrix: QuAmplitudeMatrix?
-    
-    init(matrix: QuAmplitudeMatrix?) {
-        self.matrix = matrix
-    }
-}
-
 public struct QuCircuit : QuCircuitRepresentable {
+    private class CacheAmplitudeMatrix {
+        var matrix: QuAmplitudeMatrix?
+        
+        init(matrix: QuAmplitudeMatrix?) {
+            self.matrix = matrix
+        }
+    }
+    
     public internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
     public var transformerName:String
     public fileprivate(set) var numberOfInputs:Int
@@ -77,6 +77,7 @@ public struct QuCircuit : QuCircuitRepresentable {
         self.transformerName = circuit.transformerName
         self.numberOfInputs = circuit.numberOfInputs
         self.timeline = circuit.timeline
+        self.cacheAmplitudeMatrix.matrix = circuit.cacheAmplitudeMatrix.matrix
     }
     
     fileprivate func calculateTransformationMatrix() -> QuAmplitudeMatrix {
