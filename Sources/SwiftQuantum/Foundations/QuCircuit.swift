@@ -38,19 +38,33 @@ public extension QuCircuitRepresentable {
     }
 }
 
+fileprivate class CacheAmplitudeMatrix {
+    var matrix: QuAmplitudeMatrix?
+    
+    init(matrix: QuAmplitudeMatrix?) {
+        self.matrix = matrix
+    }
+}
+
 public struct QuCircuit : QuCircuitRepresentable {
     public internal(set) var timeline:[Int:[(transformer:QuBitTransformer, indices:[Int])]] = [:]
     public var transformerName:String
     public fileprivate(set) var numberOfInputs:Int
+    
+    private let cacheAmplitudeMatrix = CacheAmplitudeMatrix(matrix: nil)
         
     public var quCircuit: QuCircuit {
         return self
     }
     
     public var transformationMatrix: QuAmplitudeMatrix {
-        // TODO: create a transformation matrix cache to avoid its recalculation each time it is requested
+        if let matrix = cacheAmplitudeMatrix.matrix {
+            return matrix
+        }
         
-        return calculateTransformationMatrix()
+        cacheAmplitudeMatrix.matrix = calculateTransformationMatrix()
+        
+        return cacheAmplitudeMatrix.matrix!
     }
     
     public init(name:String, numberOfInputs:Int) {
@@ -90,7 +104,7 @@ public struct QuCircuit : QuCircuitRepresentable {
     }
     
     fileprivate mutating func invalidateCacheTransformationMatrix() {
-        // TODO: invalidate the cached transformation matrix to force its recalculation the next time is requested
+        self.cacheAmplitudeMatrix.matrix = nil
     }
     
     public mutating func clear() {

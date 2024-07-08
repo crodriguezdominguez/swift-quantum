@@ -103,7 +103,7 @@ public struct Complex : Equatable, CustomStringConvertible, Hashable {
             return "\(im)i"
         }
         
-        let sig = (im.sign == .minus) ? "-" : "+"
+        let sig = im < 0 ? "-" : "+"
         return "\(re)\(sig)\(absIm)i"
     }
     /// .hashValue -- conforms to Hashable
