@@ -222,7 +222,7 @@ class QuantumGatesTests : XCTestCase {
         let (x1, y1, z1) = QuAnalyzer.blochSphereCoordinates(.grounded)
         XCTAssertTrue(x1 < maxAllowedError && y1 < maxAllowedError && abs(z1-1.0) < maxAllowedError)
         
-        let complexSqrt = Complex(0.5.squareRoot(), 0.0)
+        let complexSqrt = QuAmplitude(0.5.squareRoot(), 0.0)
         let (x2, y2, z2) = QuAnalyzer.blochSphereCoordinates(QuBit(groundAmplitude: complexSqrt, excitedAmplitude: complexSqrt))
         XCTAssertTrue(abs(x2-1.0) < maxAllowedError && y2 < maxAllowedError && z2 < maxAllowedError)
         
