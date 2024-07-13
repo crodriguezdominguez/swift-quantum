@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ComplexModule
 
 public struct QuAnalyzer {
     public static func truthTable(_ transformer:QuBitTransformer) -> [String:[String:Double]] {
@@ -34,7 +35,7 @@ public struct QuAnalyzer {
     }
     
     public static func blochSphereCoordinates(_ quBit:QuBit) -> (x:Double, y:Double, z:Double) {
-        let angle1_2 = acos(quBit.groundAmplitude).re
+        let angle1_2 = Complex.acos(quBit.groundAmplitude).re
         let angle1 = angle1_2*2.0
         
         let angle2:Double
@@ -43,7 +44,7 @@ public struct QuAnalyzer {
         }
         else{
             let oper = quBit.excitedAmplitude/sin(angle1_2)
-            let candidate = (log(oper)/1.0.i).re
+            let candidate = (Complex.log(oper)/1.0.i).re
             
             if candidate.isNaN || candidate.isInfinite {
                 angle2 = 0.0

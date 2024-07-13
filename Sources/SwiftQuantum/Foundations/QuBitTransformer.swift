@@ -105,7 +105,7 @@ public extension QuBitParameterizedTransformer {
     }
 }
 
-extension QuBitParameterizedTransformer where ParameterType : RealType {
+extension QuBitParameterizedTransformer where ParameterType == Double {
     var parameterStringRepresentation:String {
         return String(format: "%.2f", Double(parameter))
     }

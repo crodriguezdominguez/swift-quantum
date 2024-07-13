@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import RealModule
+import ComplexModule
 
 public struct HadamardGate : UnaryQuBitTransformer {
     public let transformerName: String = "|H|"
@@ -572,25 +574,25 @@ public struct QuMagicBasisGate : BinaryQuBitTransformer {
 }
 
 public struct QuKrausCiracGate : BinaryQuBitTransformer {
-    private var a: Complex
-    private var b: Complex
-    private var c: Complex
+    private var a: Complex<Double>
+    private var b: Complex<Double>
+    private var c: Complex<Double>
     
     public var transformerName: String {
         return "|N(\(a),\(b),\(c))|"
     }
     public let transformationMatrix: QuAmplitudeMatrix
     
-    public init(a: Complex, b: Complex, c: Complex) {
+    public init(a: Complex<Double>, b: Complex<Double>, c: Complex<Double>) {
         self.a = a
         self.b = b
         self.c = c
         
         var matrix = QuAmplitudeMatrix(rows: 4, columns: 4, repeatedValue: 0.0)
-        let cosAB = cos(a+b)
-        let cosA_B = cos(a-b)
-        let sinAB = sin(a+b)
-        let sinA_B = sin(a-b)
+        let cosAB = Complex.cos(a+b)
+        let cosA_B = Complex.cos(a-b)
+        let sinAB = Complex.sin(a+b)
+        let sinA_B = Complex.sin(a-b)
         let Eic = pow(M_E, c*1.0.i)
         let E_ic = pow(M_E, -c*1.0.i)
         

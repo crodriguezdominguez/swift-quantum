@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import RealModule
+import ComplexModule
 
 public enum QuBitState {
     case grounded(Double)
@@ -25,17 +27,7 @@ public enum QuBitState {
     }
 }
 
-public typealias QuAmplitude = Complex
-
-extension QuAmplitude {
-    public static var one: QuAmplitude {
-        return QuAmplitude(1.0, 0.0)
-    }
-    
-    public static var zero: QuAmplitude {
-        return QuAmplitude(0.0, 0.0)
-    }
-}
+public typealias QuAmplitude = Complex<Double>
 
 public struct QuBit : CustomStringConvertible, Equatable, QuAmplitudeMatrixConvertible {
     public fileprivate(set) var groundAmplitude: QuAmplitude
@@ -184,7 +176,7 @@ public struct QuBit : CustomStringConvertible, Equatable, QuAmplitudeMatrixConve
             result += "|0〉"
         }
         else if groundAmplitude != .zero {
-            result += "\(groundAmplitude)|0〉"
+            result += "\(groundAmplitude.arithmeticDescription)|0〉"
         }
         else{
             sign = ""
@@ -194,7 +186,7 @@ public struct QuBit : CustomStringConvertible, Equatable, QuAmplitudeMatrixConve
             result += "\(sign)|1〉"
         }
         else if excitedAmplitude != .zero {
-            var excitedDescription = excitedAmplitude.description
+            var excitedDescription = excitedAmplitude.arithmeticDescription
             if excitedDescription.hasPrefix("-") && !result.isEmpty {
                 excitedDescription = excitedDescription.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
                 sign = " - "
