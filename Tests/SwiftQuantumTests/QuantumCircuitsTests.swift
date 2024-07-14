@@ -537,7 +537,12 @@ class QuantumCircuitsTests : XCTestCase {
                     XCTAssertTrue(matrixQft1[i,j] =~ matrixQft2[i,j])
                 }
             }
-        }catch{
+            
+            let circuitToEncode = QuTeleportationCircuit().quCircuit
+            let encodedTelCircuit = try JSONEncoder().encode(circuitToEncode)
+            let decodedTelCircuit = try JSONDecoder().decode(QuCircuit.self, from: encodedTelCircuit)
+            XCTAssertTrue(circuitToEncode == decodedTelCircuit)
+        } catch {
             XCTAssert(false)
         }
     }

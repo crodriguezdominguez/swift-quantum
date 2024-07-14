@@ -38,7 +38,7 @@ public extension QuCircuitRepresentable {
     }
 }
 
-public struct QuCircuit : QuCircuitRepresentable {
+public struct QuCircuit : QuCircuitRepresentable, Codable {
     private class CacheAmplitudeMatrix {
         var matrix: QuAmplitudeMatrix?
         
@@ -65,6 +65,13 @@ public struct QuCircuit : QuCircuitRepresentable {
         cacheAmplitudeMatrix.matrix = calculateTransformationMatrix()
         
         return cacheAmplitudeMatrix.matrix!
+    }
+    
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let circuitString = try container.decode(String.self)
+        let circuit = try QuCircuitSerializer.deserialize(circuitString)
+        self.init(from: circuit)
     }
     
     public init(name:String, numberOfInputs:Int) {
@@ -349,6 +356,11 @@ public struct QuCircuit : QuCircuitRepresentable {
         result += "\n"
         
         return result
+    }
+    
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(QuCircuitSerializer.serialize(self))
     }
 }
 
