@@ -38,7 +38,7 @@ public extension QuCircuitRepresentable {
     }
 }
 
-public struct QuCircuit : QuCircuitRepresentable, Codable {
+public struct QuCircuit : QuCircuitRepresentable, Codable, Hashable {
     private class CacheAmplitudeMatrix {
         var matrix: QuAmplitudeMatrix?
         
@@ -72,6 +72,10 @@ public struct QuCircuit : QuCircuitRepresentable, Codable {
         let circuitString = try container.decode(String.self)
         let circuit = try QuCircuitSerializer.deserialize(circuitString)
         self.init(from: circuit)
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(QuCircuitSerializer.serialize(self))
     }
     
     public init(name:String, numberOfInputs:Int) {
