@@ -1,0 +1,13 @@
+//
+//  module.map.modulemap
+//  
+//
+//  Created by Carlos Rodríguez Domínguez on 16/7/24.
+//
+
+module CBlas [system] {
+  header "./include/cblas.h"
+  link "openblas"
+  export *
+}
+

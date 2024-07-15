@@ -7,7 +7,11 @@
 //
 
 import Foundation
+#if canImport(Accelerate)
 import Accelerate
+#else
+import CBlas
+#endif
 import Dispatch
 
 public struct QuAmplitudeMatrix {

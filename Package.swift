@@ -13,7 +13,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "SwiftQuantum",
-            targets: ["SwiftQuantum"]),
+            targets: ["SwiftQuantum"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
@@ -23,8 +23,17 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SwiftQuantum", dependencies: [
-                .product(name: "Numerics", package: "swift-numerics")
+                .product(name: "Numerics", package: "swift-numerics"),
+                "CBlas"
             ]),
+        .systemLibrary(
+                    name: "CBlas",
+                    pkgConfig: "openblas",
+                    providers: [
+                        .brew(["openblas"]),
+                        .apt(["libopenblas-base", "libopenblas-dev"])
+                    ]
+                ),
         .testTarget(
             name: "SwiftQuantumTests",
             dependencies: ["SwiftQuantum"]),
