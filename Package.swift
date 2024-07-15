@@ -22,10 +22,15 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "SwiftQuantum", dependencies: [
+            name: "SwiftQuantum",
+            dependencies: [
                 .product(name: "Numerics", package: "swift-numerics"),
                 "CBlas"
-            ]),
+            ],
+            linkerSettings: [
+                .linkedLibrary("openblas", .when(platforms: [.linux])),
+            ]
+        ),
         .systemLibrary(
                     name: "CBlas",
                     pkgConfig: "openblas",
