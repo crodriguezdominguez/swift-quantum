@@ -115,6 +115,14 @@ public struct QuCircuit : QuCircuitRepresentable, Codable, Hashable {
         }
     }
     
+    public subscript(input input: Int, atTime index: Int) -> QuBitTransformer? {
+        guard let entry = self.timeline[index]?.first(where: { $0.indices.contains{ $0 == input }}) else {
+            return nil
+        }
+        
+        return entry.transformer
+    }
+    
     fileprivate mutating func invalidateCacheTransformationMatrix() {
         self.cacheAmplitudeMatrix.matrix = nil
     }
