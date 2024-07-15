@@ -15,7 +15,7 @@ Use examples are available at `Tests/SwiftQuantumTests`.
 
 ## Using Swift Quantum in your project
 
-To use Swift Numerics in a SwiftPM project:
+To use Swift Quantum in a SwiftPM project:
 
 1. Add the following line to the dependencies in your `Package.swift` file:
 
