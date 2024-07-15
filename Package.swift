@@ -25,20 +25,20 @@ let package = Package(
             name: "SwiftQuantum",
             dependencies: [
                 .product(name: "Numerics", package: "swift-numerics"),
-                "CBlas"
+                .byName(name: "CBlas", condition: .when(platforms: [.linux])),
             ],
             linkerSettings: [
                 .linkedLibrary("openblas", .when(platforms: [.linux])),
             ]
         ),
         .systemLibrary(
-                    name: "CBlas",
-                    pkgConfig: "openblas",
-                    providers: [
-                        .brew(["openblas"]),
-                        .apt(["libopenblas-base", "libopenblas-dev"])
-                    ]
-                ),
+            name: "CBlas",
+            pkgConfig: "openblas",
+            providers: [
+                .brew(["openblas"]),
+                .apt(["libopenblas-base", "libopenblas-dev"])
+            ]
+        ),
         .testTarget(
             name: "SwiftQuantumTests",
             dependencies: ["SwiftQuantum"]),
