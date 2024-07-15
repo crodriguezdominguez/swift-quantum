@@ -315,8 +315,8 @@ public func *(left:QuAmplitudeMatrix, right:QuAmplitudeMatrix) throws -> QuAmpli
                 columns.append(right.sparseColumn(j))
             }
             
-            let q = DispatchQueue(label: "es.everywaretech.quantumcomputing", attributes: DispatchQueue.Attributes.concurrent)
-            DispatchQueue.concurrentPerform(iterations: left.rows, execute: { (i) in
+            let q = DispatchQueue(label: "swift-quantum", attributes: .concurrent)
+            DispatchQueue.concurrentPerform(iterations: left.rows, execute: { i in
                 let row = left.sparseRow(i)
                 guard left.contents.defaultValue != 0.0 || row.contents.count > 0 else {
                     return

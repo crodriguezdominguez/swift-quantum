@@ -7,11 +7,9 @@ A Swift package to support quantum computing simulations and experiments. Some o
 - Flexibility: It is possible to define custom quantum circuits and gates, which can be composed to create complex circuits or gates.
 - I/O support: Circuits can be de/serialized from/to JSON documents.
 
-Swift Quantum modules have minimal dependencies on other projects, except for [Swift Numerics](https://github.com/apple/swift-numerics).
+Swift Quantum module has minimal dependencies on other projects, except for [Swift Numerics](https://github.com/apple/swift-numerics).
 
-The current module assumes only the availability of the Swift and C standard libraries and the runtime support provided by compiler-rt.
-
-Use examples are available at `Tests/SwiftQuantumTests`.
+Several use examples are available at `Tests/SwiftQuantumTests`.
 
 ## Using Swift Quantum in your project
 
