@@ -181,7 +181,7 @@ public struct QuRegister : MutableCollection, CustomStringConvertible, QuAmplitu
             }
         }
         
-        selectedKey = equalValues[Int(arc4random()) % equalValues.count]
+        selectedKey = equalValues[Int.random(in: 0..<equalValues.count)]
         
         //var result:UInt32 = 0
         let allCharacters = selectedKey.reversed()

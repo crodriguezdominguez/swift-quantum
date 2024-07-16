@@ -47,7 +47,7 @@ class QuantumAlgorithmsTests : XCTestCase {
         // Find a number x relatively prime to n
         var x:Int = 0
         repeat {
-            x = Int(arc4random()) % N
+            x = Int.random(in: 0..<N)
         } while(gcd(N,x) > 1 || x < 2)
         
         let L = Int(ceil(log2(Double(N))))

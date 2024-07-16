@@ -137,7 +137,7 @@ public struct QuMeasurer {
             }
         }
         
-        let selectedKey = possibleValues[Int(arc4random_uniform(UInt32(possibleValues.count)))]
+        let selectedKey = possibleValues[Int.random(in: 0..<possibleValues.count)]
         
         var result:[QuBitState] = []
         for (idx, character) in selectedKey.reversed().enumerated() {
@@ -170,7 +170,7 @@ public struct QuMeasurer {
             }
         }
         
-        let selectedKey = possibleValues[Int(arc4random_uniform(UInt32(possibleValues.count)))]
+        let selectedKey = possibleValues[Int.random(in: 0..<possibleValues.count)]
         let character = selectedKey.reversed()[index]
         let probability = self.calculateProbability(of: character, at: index, in: measurements)
         if character == "1" {

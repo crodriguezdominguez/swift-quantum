@@ -134,7 +134,7 @@ public struct QuBit : CustomStringConvertible, Equatable, QuAmplitudeMatrixConve
             return .excited(1.0)
         }
         
-        let random = Double(arc4random_uniform(UInt32(RAND_MAX)))/Double(RAND_MAX)
+        let random = Double.random(in: 0..<1.0)
         
         if groundProbability =~ excitedProbability {
             if random < 0.5 {
