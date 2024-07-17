@@ -88,7 +88,7 @@ public func conj<T: Real>(_ z:Complex<T>) -> Complex<T> { return z.conjugate }
 
 // Double is default since floating-point literals are Double by default
 extension Double {
-    public static var EPSILON = 0x1p-52
+    public static let EPSILON = 0x1p-52
 }
 
 extension Complex : ExpressibleByFloatLiteral where RealType == Double {
